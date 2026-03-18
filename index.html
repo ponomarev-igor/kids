@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Буквик</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="assets/model-viewer.min.js"></script>
+</head>
+<body>
+  <main class="app-shell">
+    <section class="hero-card">
+      <div class="hero-copy">
+        <p class="eyebrow">Слушай и нажимай</p>
+        <h1>Буквик и весёлый алфавит</h1>
+        <p class="hero-text">
+          Львёнок сам подскажет, что нажимать. Ребёнку не нужно читать задания.
+        </p>
+        <div class="hero-actions">
+          <button class="primary-button" id="start-button" type="button">▶ Начать</button>
+          <button class="secondary-button" id="alphabet-button" type="button">🔤 Алфавит</button>
+          <button class="secondary-button" id="repeat-button" type="button">🔊 Повтори</button>
+          <span class="hero-hint">Туня говорит вслух</span>
+        </div>
+        <div class="speed-panel" aria-label="Скорость голоса">
+          <span class="speed-label">Скорость</span>
+          <button class="speed-button" data-speed="0.75" type="button">Медленно</button>
+          <button class="speed-button is-active" data-speed="1.0" type="button">Обычно</button>
+          <button class="speed-button" data-speed="1.3" type="button">Быстрее</button>
+        </div>
+      </div>
+
+      <div class="character-stage" aria-hidden="true">
+        <div class="spark spark-left"></div>
+        <div class="spark spark-right"></div>
+        <div class="character-3d-wrap">
+          <div class="character-3d-stage" id="character-3d-stage"></div>
+          <div class="stage-shadow"></div>
+        </div>
+        <div class="flower-meadow" id="flower-meadow"></div>
+        <div class="speech-bubble" id="speech-bubble">Привет! Давай учить буквы!</div>
+      </div>
+    </section>
+
+    <section class="progress-card">
+      <div class="progress-heading">
+        <div>
+          <p class="section-label">Звёздочки</p>
+          <strong id="progress-text">0 звёздочек</strong>
+        </div>
+        <button class="secondary-button progress-reset-button" id="reset-progress-button" type="button">Сбросить</button>
+      </div>
+      <div class="progress-track" aria-hidden="true">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <div class="stars" id="stars" aria-label="Собранные звёздочки"></div>
+      <p class="progress-note" id="progress-note">Прогресс сохраняется на этом устройстве</p>
+    </section>
+
+    <section class="lesson-card">
+      <div class="guide-panel">
+        <div class="guide-copy">
+          <p class="guide-text" id="guide-text">Нажми на букву. Я скажу, как она звучит.</p>
+        </div>
+      </div>
+
+      <div class="lesson-header">
+        <div>
+          <p class="section-label">Алфавит</p>
+          <h2 class="alphabet-title">Буквы</h2>
+        </div>
+        <div class="lesson-actions">
+          <button class="secondary-button" id="shuffle-button" type="button">↻ Буквы</button>
+          <button class="secondary-button" id="reset-order-button" type="button">⟲ Сначала</button>
+          <button class="secondary-button" id="prev-page-button" type="button">← Назад</button>
+          <span class="page-indicator" id="page-indicator">1 / 5</span>
+          <button class="secondary-button" id="next-page-button" type="button">Вперёд →</button>
+        </div>
+      </div>
+
+      <div class="letters-frame">
+        <div class="letters-grid" id="letters-grid"></div>
+      </div>
+
+      <!-- Картинки + игры -->
+      <div class="lesson-header lesson-header-words">
+        <div>
+          <p class="section-label">Картинки</p>
+          <h2>Нажимай на картинки</h2>
+        </div>
+        <div class="game-switcher">
+          <button class="game-big-button game-big-button--picture" id="start-picture-game" type="button">
+            <span class="game-big-emoji">🖼️</span>
+            <span class="game-big-label">Найди картинку!</span>
+          </button>
+          <button class="game-big-button game-big-button--letter" id="start-letter-game" type="button">
+            <span class="game-big-emoji">🔤</span>
+            <span class="game-big-label">Найди букву!</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Режим просмотра -->
+      <div class="words-frame" id="words-frame">
+        <div class="words-grid" id="words-grid"></div>
+      </div>
+
+      <!-- Режим игры -->
+      <div class="inline-game" id="inline-game" hidden>
+        <div class="guide-panel guide-panel-game">
+          <div class="guide-copy">
+            <p class="guide-text" id="game-guide-text">Слушай, что ищем.</p>
+          </div>
+        </div>
+        <p class="game-task" id="game-task">Нажми «Игра», чтобы начать</p>
+        <div class="game-options" id="game-options"></div>
+        <p class="game-result" id="game-result" aria-live="polite"></p>
+        <div class="game-controls">
+          <button class="secondary-button" id="repeat-game-button" type="button">🔊 Повтори</button>
+          <button class="secondary-button stop-button" id="stop-game-button" type="button">⬅ Назад к буквам</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="lumi-3d.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
