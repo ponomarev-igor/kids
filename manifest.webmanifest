@@ -1,0 +1,20 @@
+{
+  "name": "Буквик",
+  "short_name": "Буквик",
+  "description": "Детское приложение для изучения русского алфавита.",
+  "lang": "ru",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#dff9ff",
+  "theme_color": "#9ee6ff",
+  "icons": [
+    {
+      "src": "assets/images/animal-lion.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

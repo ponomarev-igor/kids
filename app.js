@@ -886,3 +886,9 @@ updateProgress();
 setBubble("Нажми кнопку начать");
 setGuideText("Нажми на букву. Я скажу, как она звучит.");
 window.lumi3d?.moveHome();
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js").catch(() => {});
+  });
+}
