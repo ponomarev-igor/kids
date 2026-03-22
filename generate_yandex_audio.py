@@ -123,6 +123,27 @@ def generate_letter_files(api_key, folder_id, voice, speed, letter_speed, emotio
             print(f"skip details/{letter}.mp3")
 
 
+def generate_number_files(api_key, folder_id, voice, speed, emotion, force):
+    for i in range(101):
+        target = AUDIO_ROOT / "numbers" / f"{i}.mp3"
+        if not target.exists() or force:
+            print(f"number {i}")
+            audio = synthesize(api_key, folder_id, voice, str(i), speed, emotion)
+            write_binary(target, audio)
+            time.sleep(0.3)
+        else:
+            print(f"skip numbers/{i}.mp3")
+
+        prompt_target = AUDIO_ROOT / "number-prompts" / f"{i}.mp3"
+        if not prompt_target.exists() or force:
+            print(f"number-prompt {i}")
+            audio = synthesize(api_key, folder_id, voice, f"Найди цифру {i}!", speed, emotion)
+            write_binary(prompt_target, audio)
+            time.sleep(0.3)
+        else:
+            print(f"skip number-prompts/{i}.mp3")
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Generate audio for kids-alphabet-app using Yandex SpeechKit."
@@ -149,6 +170,7 @@ def main():
         generate_letter_files(api_key, folder_id, args.voice, args.speed, args.letter_speed, args.emotion, voice_lines["letters"], args.force)
         generate_prompt_files(api_key, folder_id, args.voice, args.speed, args.emotion, voice_lines["prompts"], args.force)
         generate_animal_files(api_key, folder_id, args.voice, args.speed, args.emotion, voice_lines["animals"], voice_lines["animal-prompts"], args.force)
+        generate_number_files(api_key, folder_id, args.voice, args.speed, args.emotion, args.force)
     except urllib.error.HTTPError as exc:
         body = exc.read().decode("utf-8", errors="replace")
         print(body, file=sys.stderr)

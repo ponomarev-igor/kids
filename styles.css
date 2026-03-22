@@ -1895,3 +1895,106 @@ h2 {
     min-height: 116px;
   }
 }
+
+/* ── Цифры ── */
+
+.numbers-section-card {
+  padding: 20px 24px 24px;
+}
+
+.numbers-frame {
+  padding: 8px 0;
+}
+
+.numbers-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 0 8px;
+}
+
+.number-card {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  border: 2px solid rgba(32, 66, 95, 0.1);
+  background: linear-gradient(180deg, #fff, #e4f2ff);
+  color: var(--ink);
+  font-family: "Baloo 2", cursive;
+  font-size: 1.3rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.number-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(32, 66, 95, 0.15);
+}
+
+.number-card.is-active {
+  background: linear-gradient(180deg, #ffd86b, #ffab5c);
+  border-color: #ffab5c;
+  box-shadow: 0 6px 14px rgba(255, 171, 92, 0.35);
+  transform: translateY(-2px) scale(1.1);
+}
+
+.number-game-option {
+  font-size: 2rem;
+  min-width: 90px;
+}
+
+.game-big-button--number {
+  background: linear-gradient(135deg, #5cb8e4, #3a7fd4);
+  box-shadow: 0 12px 28px rgba(58, 127, 212, 0.28);
+}
+
+/* ── Математика ── */
+
+.game-big-button--math {
+  background: linear-gradient(135deg, #f97b3d, #e84393);
+  box-shadow: 0 12px 28px rgba(233, 67, 147, 0.28);
+}
+
+.math-problem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 20px 16px 12px;
+  flex-wrap: wrap;
+}
+
+.math-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  max-width: 120px;
+}
+
+.math-dot {
+  font-size: 2rem;
+  line-height: 1;
+  animation: dotPop 0.3s ease backwards;
+}
+
+.math-sign {
+  font-family: "Baloo 2", cursive;
+  font-size: 2.6rem;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1;
+}
+
+.math-question {
+  color: #ff6c53;
+}
+
+@keyframes dotPop {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}

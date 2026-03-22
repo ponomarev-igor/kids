@@ -131,6 +131,71 @@
         </div>
       </div>
     </section>
+
+    <section class="lesson-card numbers-section-card">
+      <div class="lesson-header">
+        <div>
+          <p class="section-label">Цифры</p>
+          <h2 class="alphabet-title">Числа от 0 до 100</h2>
+        </div>
+        <div class="game-switcher">
+          <button class="game-big-button game-big-button--number" id="start-number-game" type="button">
+            <span class="game-big-emoji">🔢</span>
+            <span class="game-big-label">Найди цифру!</span>
+          </button>
+          <button class="game-big-button game-big-button--math" id="start-math-game" type="button">
+            <span class="game-big-emoji">➕</span>
+            <span class="game-big-label">Считай!</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="guide-panel">
+        <div class="guide-copy">
+          <p class="guide-text" id="number-guide-text">Нажми на цифру. Я скажу, как она называется.</p>
+        </div>
+      </div>
+
+      <div class="numbers-frame" id="numbers-frame">
+        <div class="numbers-grid" id="numbers-grid"></div>
+      </div>
+
+      <div class="inline-game" id="math-game" hidden>
+        <div class="guide-panel guide-panel-game">
+          <div class="guide-copy">
+            <p class="guide-text" id="math-game-guide-text">Слушай задачу и выбери ответ.</p>
+          </div>
+        </div>
+        <div class="math-problem" id="math-problem">
+          <div class="math-dots" id="math-dots-a"></div>
+          <div class="math-sign">+</div>
+          <div class="math-dots" id="math-dots-b"></div>
+          <div class="math-sign">=</div>
+          <div class="math-sign math-question">?</div>
+        </div>
+        <div class="game-options" id="math-game-options"></div>
+        <p class="game-result" id="math-game-result" aria-live="polite"></p>
+        <div class="game-controls">
+          <button class="secondary-button" id="repeat-math-game-button" type="button">🔊 Повтори</button>
+          <button class="secondary-button stop-button" id="stop-math-game-button" type="button">⬅ Назад к цифрам</button>
+        </div>
+      </div>
+
+      <div class="inline-game" id="number-game" hidden>
+        <div class="guide-panel guide-panel-game">
+          <div class="guide-copy">
+            <p class="guide-text" id="number-game-guide-text">Слушай, что ищем.</p>
+          </div>
+        </div>
+        <p class="game-task" id="number-game-task">Нажми «Игра», чтобы начать</p>
+        <div class="game-options" id="number-game-options"></div>
+        <p class="game-result" id="number-game-result" aria-live="polite"></p>
+        <div class="game-controls">
+          <button class="secondary-button" id="repeat-number-game-button" type="button">🔊 Повтори</button>
+          <button class="secondary-button stop-button" id="stop-number-game-button" type="button">⬅ Назад к цифрам</button>
+        </div>
+      </div>
+    </section>
   </main>
 
   <script type="module" src="lumi-3d.js"></script>

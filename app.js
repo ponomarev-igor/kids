@@ -116,6 +116,9 @@ const phraseAudio = {
   findPicture: "assets/audio/find-picture.mp3",
   correct: "assets/audio/correct.mp3",
   eto: "assets/audio/eto.mp3",
+  plus: "assets/audio/plus.mp3",
+  "skolko-budet": "assets/audio/skolko-budet.mp3",
+  budet: "assets/audio/budet.mp3",
 };
 
 // DOM
@@ -879,9 +882,290 @@ resetProgressButton.addEventListener("click", () => {
   speak("Я очистил все звёздочки. Давай начнём сначала.", "resetProgress");
 });
 
+// ── Математика: сложение до 10 ──
+
+const mathGame = document.getElementById("math-game");
+const mathGameOptions = document.getElementById("math-game-options");
+const mathGameResult = document.getElementById("math-game-result");
+const mathGameGuideText = document.getElementById("math-game-guide-text");
+const mathDotsA = document.getElementById("math-dots-a");
+const mathDotsB = document.getElementById("math-dots-b");
+
+let mathGameMode = false;
+let currentMathRound = null;
+
+const dotEmoji = "🟡";
+
+function renderDots(container, count) {
+  container.innerHTML = "";
+  for (let i = 0; i < count; i++) {
+    const dot = document.createElement("span");
+    dot.className = "math-dot";
+    dot.textContent = dotEmoji;
+    container.appendChild(dot);
+  }
+}
+
+function showMathBrowseMode() {
+  mathGameMode = false;
+  currentMathRound = null;
+  cancelSpeechQueue();
+  mathGame.hidden = true;
+  numbersFrame.hidden = false;
+  setCharacterMood("happy");
+}
+
+function showMathGameMode() {
+  cancelSpeechQueue();
+  mathGameMode = true;
+  currentMathRound = null;
+  numbersFrame.hidden = true;
+  numberGame.hidden = true;
+  mathGame.hidden = false;
+  mathGameResult.textContent = "";
+  mathGameOptions.innerHTML = "";
+  setTimeout(() => scrollSectionIntoView(mathGame), 80);
+}
+
+function buildMathRound() {
+  if (!mathGameMode) return;
+  const a = Math.floor(Math.random() * 6) + 1;
+  const maxB = 10 - a;
+  const b = Math.floor(Math.random() * Math.min(maxB, 5)) + 1;
+  const answer = a + b;
+
+  currentMathRound = { a, b, answer };
+  mathGameResult.textContent = "";
+  mathGameOptions.innerHTML = "";
+  mathGameGuideText.textContent = `${a} + ${b} = ?`;
+
+  renderDots(mathDotsA, a);
+  renderDots(mathDotsB, b);
+
+  const wrong = new Set([answer]);
+  const distractors = [];
+  while (distractors.length < 3) {
+    const d = Math.floor(Math.random() * 11);
+    if (!wrong.has(d)) { wrong.add(d); distractors.push(d); }
+  }
+  const options = shuffle([answer, ...distractors]);
+
+  options.forEach((n) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "game-option number-game-option";
+    btn.textContent = n;
+    btn.setAttribute("aria-label", `Ответ ${n}`);
+
+    btn.addEventListener("click", () => {
+      const isCorrect = n === currentMathRound.answer;
+      mathGameOptions.querySelectorAll(".game-option").forEach((o) => o.classList.remove("is-target"));
+      btn.classList.add(isCorrect ? "correct" : "wrong");
+
+      if (isCorrect) {
+        mathGameResult.textContent = "Правильно!";
+        setCharacterMood("celebrate");
+        moveMascotToElement(btn, "celebrate", "Молодец!", 3200);
+        const cheerIndex = Math.floor(Math.random() * cheerPhrases.length);
+        playSequence(
+          [phraseAudio[`cheer-${cheerIndex}`], phraseAudio.budet, buildNumberAudioPath(n)],
+          cheerPhrases[cheerIndex],
+          buildMathRound,
+        );
+      } else {
+        mathGameResult.textContent = "Не то, подумай ещё!";
+        setCharacterMood("oops");
+        moveMascotToElement(btn, "oops", "Не то!", 1600);
+        playSequence(
+          [phraseAudio.repeatTry, buildNumberAudioPath(currentMathRound.a), phraseAudio.plus,
+           buildNumberAudioPath(currentMathRound.b), phraseAudio["skolko-budet"]],
+          `Попробуй ещё: ${currentMathRound.a} + ${currentMathRound.b} = ?`,
+        );
+        setTimeout(() => btn.classList.remove("wrong"), 500);
+      }
+    });
+
+    mathGameOptions.appendChild(btn);
+  });
+
+  setTimeout(() => {
+    playSequence(
+      [buildNumberAudioPath(a), phraseAudio.plus, buildNumberAudioPath(b), phraseAudio["skolko-budet"]],
+      `${a} + ${b} = ?`,
+    );
+  }, 300);
+}
+
+document.getElementById("start-math-game").addEventListener("click", () => {
+  showMathGameMode();
+  setCharacterMood("happy");
+  window.lumi3d?.setReaction("Считаем!", 1800);
+  buildMathRound();
+});
+
+document.getElementById("stop-math-game-button").addEventListener("click", () => {
+  showMathBrowseMode();
+});
+
+document.getElementById("repeat-math-game-button").addEventListener("click", () => {
+  if (!mathGameMode || !currentMathRound) return;
+  const { a, b } = currentMathRound;
+  setCharacterMood("thinking");
+  playSequence(
+    [buildNumberAudioPath(a), phraseAudio.plus, buildNumberAudioPath(b), phraseAudio["skolko-budet"]],
+    `${a} + ${b} = ?`,
+  );
+});
+
+// ── Цифры ──
+
+const numbersFrame = document.getElementById("numbers-frame");
+const numberGame = document.getElementById("number-game");
+const numberGameTask = document.getElementById("number-game-task");
+const numberGameOptions = document.getElementById("number-game-options");
+const numberGameResult = document.getElementById("number-game-result");
+const numberGuideText = document.getElementById("number-guide-text");
+const numberGameGuideText = document.getElementById("number-game-guide-text");
+
+let numberGameMode = false;
+let currentNumberRound = null;
+
+function buildNumberAudioPath(n) {
+  return `assets/audio/numbers/${n}.mp3`;
+}
+
+function buildNumberPromptPath(n) {
+  return `assets/audio/number-prompts/${n}.mp3`;
+}
+
+function speakNumber(n) {
+  cancelSpeechQueue();
+  document.querySelectorAll(".number-card").forEach((b) => b.classList.remove("is-active"));
+  const btn = document.querySelector(`.number-card[data-n="${n}"]`);
+  if (btn) btn.classList.add("is-active");
+  setCharacterMood("thinking");
+  numberGuideText.textContent = `Цифра ${n}.`;
+  window.lumi3d?.setReaction(String(n), 1400);
+  playAudio(buildNumberAudioPath(n), Math.min(speechRate, 0.9));
+}
+
+function renderNumbers() {
+  const grid = document.getElementById("numbers-grid");
+  grid.innerHTML = "";
+  for (let i = 0; i <= 100; i++) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "number-card";
+    btn.dataset.n = i;
+    btn.textContent = i;
+    btn.addEventListener("click", () => speakNumber(i));
+    grid.appendChild(btn);
+  }
+}
+
+function showNumberBrowseMode() {
+  numberGameMode = false;
+  currentNumberRound = null;
+  cancelSpeechQueue();
+  numbersFrame.hidden = false;
+  numberGame.hidden = true;
+  setCharacterMood("happy");
+}
+
+function showNumberGameMode() {
+  cancelSpeechQueue();
+  numberGameMode = true;
+  currentNumberRound = null;
+  numbersFrame.hidden = true;
+  numberGame.hidden = false;
+  numberGameResult.textContent = "";
+  numberGameOptions.innerHTML = "";
+  setTimeout(() => scrollSectionIntoView(numberGame), 80);
+}
+
+function buildNumberRound() {
+  if (!numberGameMode) return;
+  const answer = Math.floor(Math.random() * 101);
+  const all = Array.from({ length: 101 }, (_, i) => i);
+  const distractors = shuffle(all.filter((n) => n !== answer)).slice(0, 3);
+  const options = shuffle([answer, ...distractors]);
+
+  currentNumberRound = answer;
+  numberGameTask.textContent = `Найди цифру ${answer}!`;
+  numberGameGuideText.textContent = "Слушай и найди нужную цифру.";
+  numberGameResult.textContent = "";
+  numberGameOptions.innerHTML = "";
+
+  options.forEach((n) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "game-option number-game-option";
+    btn.textContent = n;
+    btn.setAttribute("aria-label", `Цифра ${n}`);
+
+    btn.addEventListener("click", () => {
+      const isCorrect = n === currentNumberRound;
+      numberGameOptions.querySelectorAll(".number-game-option").forEach((o) => o.classList.remove("is-target"));
+      btn.classList.add(isCorrect ? "correct" : "wrong");
+
+      if (isCorrect) {
+        numberGameResult.textContent = "Правильно!";
+        setCharacterMood("celebrate");
+        moveMascotToElement(btn, "celebrate", "Молодец!", 3200);
+        const cheerIndex = Math.floor(Math.random() * cheerPhrases.length);
+        playSequence(
+          [phraseAudio[`cheer-${cheerIndex}`], phraseAudio.eto, buildNumberAudioPath(n)],
+          cheerPhrases[cheerIndex],
+          buildNumberRound,
+        );
+      } else {
+        numberGameResult.textContent = "Не то, попробуй ещё!";
+        setCharacterMood("oops");
+        moveMascotToElement(btn, "oops", "Не то!", 1600);
+        playSequence(
+          [phraseAudio.repeatTry, buildNumberPromptPath(currentNumberRound)],
+          `Попробуй ещё! Найди цифру ${currentNumberRound}!`,
+        );
+        setTimeout(() => btn.classList.remove("wrong"), 500);
+      }
+    });
+
+    numberGameOptions.appendChild(btn);
+  });
+
+  setTimeout(() => {
+    playSequence(
+      [buildNumberPromptPath(answer)],
+      `Найди цифру ${answer}!`,
+    );
+  }, 300);
+}
+
+document.getElementById("start-number-game").addEventListener("click", () => {
+  showNumberGameMode();
+  setCharacterMood("happy");
+  window.lumi3d?.setReaction("Найди цифру!", 1800);
+  buildNumberRound();
+});
+
+document.getElementById("stop-number-game-button").addEventListener("click", () => {
+  showNumberBrowseMode();
+  numberGuideText.textContent = "Нажми на цифру. Я скажу, как она называется.";
+});
+
+document.getElementById("repeat-number-game-button").addEventListener("click", () => {
+  if (!numberGameMode || currentNumberRound === null) return;
+  setCharacterMood("thinking");
+  playSequence(
+    [buildNumberPromptPath(currentNumberRound)],
+    `Найди цифру ${currentNumberRound}!`,
+  );
+});
+
 restoreProgress();
 applySpeedUI();
 renderLetters();
+renderNumbers();
 updateProgress();
 setBubble("Нажми кнопку начать");
 setGuideText("Нажми на букву. Я скажу, как она звучит.");
