@@ -167,6 +167,17 @@ let speakTimer = null;
 let speakingLocked = false;
 let resizeTimer = null;
 const storageKey = "bukvik-progress-v1";
+
+// iOS Safari: разблокировка аудио при первом касании
+let audioUnlocked = false;
+function unlockAudio() {
+  if (audioUnlocked) return;
+  audioUnlocked = true;
+  const a = new Audio();
+  a.play().catch(() => {});
+}
+document.addEventListener("touchstart", unlockAudio, { once: true, passive: true });
+document.addEventListener("click", unlockAudio, { once: true });
 const flowerMeadow = document.getElementById("flower-meadow");
 const flowerEmojis = ["🌸", "🌼", "🌺", "🌻", "🌷", "🌹", "💐", "🏵️"];
 
@@ -329,7 +340,9 @@ function playAudio(src, rate, onEnded) {
     currentAudio = null;
   }
   const audio = new Audio(src);
-  audio.playbackRate = rate !== undefined ? rate : speechRate;
+  const targetRate = rate !== undefined ? rate : speechRate;
+  audio.playbackRate = targetRate;
+  audio.addEventListener("canplay", () => { audio.playbackRate = targetRate; }, { once: true });
   currentAudio = audio;
   setSpeaking(true);
   audio.addEventListener("ended", () => {
@@ -386,6 +399,7 @@ function playSequence(srcs, bubbleText, onComplete) {
     }
     const audio = new Audio(srcs[index]);
     audio.playbackRate = speechRate;
+    audio.addEventListener("canplay", () => { audio.playbackRate = speechRate; }, { once: true });
     if (currentAudio) currentAudio.pause();
     currentAudio = audio;
     setSpeaking(true);
